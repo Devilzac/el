@@ -1,13 +1,15 @@
 <template>
-   <div>
-     <table>
-       <tbody>
-         <tr>
-           <td>hola</td>
-         </tr>
-       </tbody>
-     </table>
-   </div>
+<div class="row">
+  <div class="card col-4" v-for="item in todo" :key="item.id">
+    <div class="card-body">
+      <h5 class="card-title">
+        <span v-if="item.user">{{ item.user.name.first }} {{ item.user.name.last }} </span>
+      </h5>
+      <p class="card-text" v-if="item.text">{{item.text}}</p>
+      <h6 v-if="item.upvotes"><strong>Votos</strong> | {{item.upvotes}}</h6>
+    </div>
+  </div>
+</div>
 </template>
 
 <script>
@@ -16,19 +18,22 @@ import Axios from 'axios';
 export default {
   data() {
     return {
-      titulo: null,
+      todo: null,
+      page: 1,
+      perPage: 6,
+      pages: [],
     };
   },
   mounted() {
     this.getInfo();
   },
   methods: {
-    getInfo() {
-      Axios.get('https://cat-fact.herokuapp.com').then((response) => {
-        console.log('response: ', response);
-      }).catch((e) => {
-        console.log(e);
-      });
+    async getInfo() {
+      const response = await Axios.get('https://cors-anywhere.herokuapp.com/https://cat-fact.herokuapp.com/facts');
+      this.todo = await response.data.all;
+    },
+    setPages() {
+      const numberOfPages = Math.ceil(this.todo.length / this.perPage);
     },
   },
 };
